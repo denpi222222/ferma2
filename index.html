@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="https://websim.ai">
+  <title>Minecraft-like Terrain with First-Person Mode - WebSim</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #fps, #toggleMode, #instructions, #inventory, #crafting, #compass {
+      position: absolute;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    #fps { top: 10px; left: 10px; }
+    #toggleMode { top: 10px; right: 10px; cursor: pointer; }
+    #instructions { bottom: 10px; left: 50%; transform: translateX(-50%); text-align: center; }
+    #inventory { bottom: 60px; right: 10px; max-width: 150px; }
+    #crafting { top: 10px; left: 10px; }
+    #compass { bottom: 10px; right: 10px; }
+  </style>
+</head>
+<body>
+  <div id="fps">FPS: 0</div>
+  <button id="toggleMode">Toggle First-Person Mode</button>
+  <div id="instructions">Click to start. Use WASD to move, Space to jump over blocks, and mouse to look around.</div>
+  <div id="inventory" style="background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px;"></div>
+  <div id="crafting" style="background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px;">
+    <button onclick="craft('wood_planks')">Craft Wood Planks</button>
+    <button onclick="craft('stick')">Craft Stick</button>
+    <button onclick="craft('wooden_pickaxe')">Craft Wooden Pickaxe</button>
+  </div>
+  <div id="compass">N</div>
+
+  <script>
+    // JavaScript код игры здесь (выше в ответе был весь код)
+  </script>
+</body>
+</html>
