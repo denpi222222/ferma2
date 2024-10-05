@@ -69,20 +69,27 @@
     // Ландшафт
     const simplex = new SimplexNoise();
     const size = 100;
-    const geometry = new THREE.PlaneGeometry(size, size, size - 1, size - 1);
+
+    // Используем PlaneBufferGeometry вместо PlaneGeometry
+    const geometry = new THREE.PlaneBufferGeometry(size, size, size - 1, size - 1);
     geometry.rotateX(-Math.PI / 2);
 
     const material = new THREE.MeshStandardMaterial({ color: 0x8B4513, wireframe: false });
     const plane = new THREE.Mesh(geometry, material);
     scene.add(plane);
 
-    // Генерация шума для ландшафта
-    geometry.vertices.forEach(function (vertex) {
+    // Получаем позиции вершин как атрибуты
+    const positionAttribute = geometry.attributes.position;
+    const vertex = new THREE.Vector3();
+
+    // Генерация шума для вершин (создание высот)
+    for (let i = 0; i < positionAttribute.count; i++) {
+      vertex.fromBufferAttribute(positionAttribute, i);
       const x = vertex.x / 10;
       const y = vertex.y / 10;
       vertex.z = simplex.noise2D(x, y) * 5;  // Высота ландшафта
-    });
-    geometry.verticesNeedUpdate = true;
+      positionAttribute.setZ(i, vertex.z);  // Обновляем Z координату
+    }
 
     // Освещение
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
