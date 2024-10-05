@@ -1,15 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base href="https://websim.ai">
-  <title>Minecraft-like Terrain with First-Person Mode - WebSim</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js Minecraft-like Terrain</title>
+  
+  <!-- Подключение библиотеки three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- Подключение библиотеки simplex-noise -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
-    #fps, #toggleMode, #instructions, #inventory, #crafting, #compass {
+    
+    #fps {
       position: absolute;
+      top: 10px;
+      left: 10px;
       color: white;
       font-family: Arial, sans-serif;
       font-size: 16px;
@@ -17,28 +26,104 @@
       padding: 5px 10px;
       border-radius: 5px;
     }
-    #fps { top: 10px; left: 10px; }
-    #toggleMode { top: 10px; right: 10px; cursor: pointer; }
-    #instructions { bottom: 10px; left: 50%; transform: translateX(-50%); text-align: center; }
-    #inventory { bottom: 60px; right: 10px; max-width: 150px; }
-    #crafting { top: 10px; left: 10px; }
-    #compass { bottom: 10px; right: 10px; }
+
+    #instructions {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    #toggleMode {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="fps">FPS: 0</div>
   <button id="toggleMode">Toggle First-Person Mode</button>
-  <div id="instructions">Click to start. Use WASD to move, Space to jump over blocks, and mouse to look around.</div>
-  <div id="inventory" style="background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px;"></div>
-  <div id="crafting" style="background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px;">
-    <button onclick="craft('wood_planks')">Craft Wood Planks</button>
-    <button onclick="craft('stick')">Craft Stick</button>
-    <button onclick="craft('wooden_pickaxe')">Craft Wooden Pickaxe</button>
-  </div>
-  <div id="compass">N</div>
+  <div id="instructions">Click to start. Use W to move forward, A to move left, S to move backward, D to move right, Space to jump, and mouse to look around.</div>
 
   <script>
-    // JavaScript код игры здесь (выше в ответе был весь код)
+    // Инициализация Three.js сцены
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Ландшафт
+    const simplex = new SimplexNoise();
+    const size = 100;
+    const geometry = new THREE.PlaneGeometry(size, size, size - 1, size - 1);
+    geometry.rotateX(-Math.PI / 2);
+
+    const material = new THREE.MeshStandardMaterial({ color: 0x8B4513, wireframe: false });
+    const plane = new THREE.Mesh(geometry, material);
+    scene.add(plane);
+
+    // Генерация шума для ландшафта
+    geometry.vertices.forEach(function (vertex) {
+      const x = vertex.x / 10;
+      const y = vertex.y / 10;
+      vertex.z = simplex.noise2D(x, y) * 5;  // Высота ландшафта
+    });
+    geometry.verticesNeedUpdate = true;
+
+    // Освещение
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(100, 100, 100).normalize();
+    scene.add(directionalLight);
+
+    // Позиция камеры
+    camera.position.y = 50;
+    camera.position.z = 100;
+
+    // Управление камерой
+    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'w') moveForward = true;
+      if (e.key === 's') moveBackward = true;
+      if (e.key === 'a') moveLeft = true;
+      if (e.key === 'd') moveRight = true;
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'w') moveForward = false;
+      if (e.key === 's') moveBackward = false;
+      if (e.key === 'a') moveLeft = false;
+      if (e.key === 'd') moveRight = false;
+    });
+
+    // Основной цикл рендера
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      if (moveForward) camera.position.z -= 0.5;
+      if (moveBackward) camera.position.z += 0.5;
+      if (moveLeft) camera.position.x -= 0.5;
+      if (moveRight) camera.position.x += 0.5;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
   </script>
 </body>
 </html>
